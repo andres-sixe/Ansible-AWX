@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Instalar Python 3 y Git
+      dnf:
+        name:
+          - python3
+          - python3-pip
+          - git
+        state: present
