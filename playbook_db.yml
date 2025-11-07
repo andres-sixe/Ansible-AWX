@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Instalar PostgreSQL
+      dnf:
+        name: postgresql-server
+        state: present
+    - name: Inicializar la base de datos
+      command: postgresql-setup --initdb
+      args:
+        creates: /var/lib/pgsql/data/PG_VERSION
+    - name: Iniciar y habilitar servicio postgresql
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
