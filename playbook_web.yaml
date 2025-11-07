@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    welcome_message: "Página desplegada por AWX (default)"
+  tasks:
+    - name: Instalar Apache (httpd)
+      dnf:
+        name: httpd
+        state: present
+    - name: Desplegar plantilla de index.html
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+      notify: reiniciar httpd
+    - name: Iniciar y habilitar servicio httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+  handlers:
+    - name: reiniciar httpd
+      service:
+        name: httpd
+        state: restarted
