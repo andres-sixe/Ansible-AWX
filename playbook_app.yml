@@ -1,11 +1,20 @@
 ---
-- hosts: all
+- name: Instalar Capa de Aplicación
+  hosts: all
   become: yes
   tasks:
-    - name: Instalar Python 3 y Git
+    - name: Instalar PHP y dependencias
       dnf:
-        name:
-          - python3
-          - python3-pip
-          - git
+        name: 
+          - php
+          - php-cli
+          - php-mysqlnd
         state: present
+
+    - name: Crear archivo de configuración de App
+      copy:
+        dest: /etc/myapp_config.ini
+        content: |
+          [database]
+          host=db-server
+          user=admin
