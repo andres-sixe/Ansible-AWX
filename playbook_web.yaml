@@ -1,14 +1,18 @@
 ---
 - name: Instalar Capa Web
-  hosts: all
-  gather_facts: no # Para que sea rápido
+  hosts: all  # Dejamos que entre todo el mundo
+  become: yes
   tasks:
-    - name: Expulsar a los que no son Web
-      meta: end_host
-      when: "'web' not in inventory_hostname"
+    - name: Instalar Apache
+      dnf:
+        name: httpd
+        state: present
+      # LA LÓGICA MÁGICA: Solo ejecuta si 'web' es parte del nombre
+      when: "'web' in inventory_hostname"
 
-    - name: Tareas reales (Solo llegarán aquí los web)
-      block:
-        - name: Instalar Apache
-          dnf: ...
-      # No necesitas 'when' aquí porque los demás ya fueron expulsados
+    - name: Iniciar Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: "'web' in inventory_hostname"
