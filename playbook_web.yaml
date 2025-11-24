@@ -1,20 +1,14 @@
 ---
-- name: Instalar Capa Web (Frontend)
+- name: Instalar Capa Web
   hosts: all
-  become: yes
+  gather_facts: no # Para que sea rápido
   tasks:
-    - name: Instalar Apache Web Server
-      dnf:
-        name: httpd
-        state: present
+    - name: Expulsar a los que no son Web
+      meta: end_host
+      when: "'web' not in inventory_hostname"
 
-    - name: Iniciar servicio Apache
-      service:
-        name: httpd
-        state: started
-        enabled: yes
-
-    - name: Crear index.html
-      copy:
-        dest: /var/www/html/index.html
-        content: "<h1>Aplicacion Desplegada por AWX Workflows</h1>"
+    - name: Tareas reales (Solo llegarán aquí los web)
+      block:
+        - name: Instalar Apache
+          dnf: ...
+      # No necesitas 'when' aquí porque los demás ya fueron expulsados
