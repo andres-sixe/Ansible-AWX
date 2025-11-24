@@ -1,6 +1,6 @@
 ---
 - name: Instalar Capa de Base de Datos
-  hosts: all
+  hosts: "*db*"  # <--- FILTRO POR PATRÓN DE NOMBRE
   become: yes
   tasks:
     - name: Instalar servidor MariaDB
@@ -13,8 +13,3 @@
         name: mariadb
         state: started
         enabled: yes
-
-    - name: Crear base de datos dummy
-      command: touch /var/lib/mysql/app_db_initialized
-      args:
-        creates: /var/lib/mysql/app_db_initialized
