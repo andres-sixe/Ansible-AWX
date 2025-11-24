@@ -1,26 +1,18 @@
 ---
-- name: Instalar Capa de Aplicación
-  hosts: all
+- name: Instalar Capa Web
+  hosts: all  # Dejamos que entre todo el mundo
   become: yes
-
-  pre_tasks:
-    - name: 🛡️ GUARDRAIL - Verificar que este host es de Aplicación
-      ansible.builtin.assert:
-        that:
-          - "'app' in inventory_hostname"
-        fail_msg: "❌ ERROR CRÍTICO: Se intentó ejecutar el playbook de APP en '{{ inventory_hostname }}'. Deteniendo ejecución."
-        success_msg: "✅ Verificación exitosa: '{{ inventory_hostname }}' es un servidor de aplicación."
-
   tasks:
-    - name: Instalar PHP y dependencias
+    - name: Instalar Apache
       dnf:
-        name: 
-          - php
-          - php-cli
-          - php-mysqlnd
+        name: httpd
         state: present
+      # LA LÓGICA MÁGICA: Solo ejecuta si 'web' es parte del nombre
+      when: "'web' in inventory_hostname"
 
-    - name: Crear config dummy
-      copy:
-        dest: /etc/myapp_config.ini
-        content: "db_host=db-server"
+    - name: Iniciar Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: "'web' in inventory_hostname"
