@@ -1,18 +1,42 @@
 ---
-- name: Instalar Capa Web
-  hosts: all  # Dejamos que entre todo el mundo
+- name: Instalar Capa Web (Frontend)
+  hosts: all
+  gather_facts: yes
   become: yes
+
+  pre_tasks:
+    - name: 🛑 Filtrado de Seguridad - Expulsar hosts que no son WEB
+      meta: end_host
+      when: "'web' not in inventory_hostname"
+
   tasks:
-    - name: Instalar Apache
+    - name: Instalar Apache Web Server
       dnf:
         name: httpd
         state: present
-      # LA LÓGICA MÁGICA: Solo ejecuta si 'web' es parte del nombre
-      when: "'web' in inventory_hostname"
 
-    - name: Iniciar Apache
+    - name: Iniciar y habilitar Apache
       service:
         name: httpd
         state: started
         enabled: yes
-      when: "'web' in inventory_hostname"
+
+    - name: Desplegar página de inicio personalizada
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <html>
+          <head><title>AWX Lab Exituso</title></head>
+          <body>
+            <h1>¡Hola desde {{ inventory_hostname }}!</h1>
+            <p>Despliegue orquestado completado correctamente.</p>
+          </body>
+          </html>
+        mode: '0644'
+      notify: Reiniciar Apache
+
+  handlers:
+    - name: Reiniciar Apache
+      service:
+        name: httpd
+        state: restarted
