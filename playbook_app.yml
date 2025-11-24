@@ -1,6 +1,6 @@
 ---
 - name: Instalar Capa de Aplicación
-  hosts: all
+  hosts: webservers
   become: yes
   tasks:
     - name: Instalar PHP y dependencias
