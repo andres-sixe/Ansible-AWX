@@ -1,14 +1,36 @@
 ---
-- name: Instalar Capa Web
+- name: Instalar Capa de Aplicación
   hosts: all
-  gather_facts: no # Para que sea rápido
-  tasks:
-    - name: Expulsar a los que no son Web
-      meta: end_host
-      when: "'web' not in inventory_hostname"
+  gather_facts: yes
+  become: yes
 
-    - name: Tareas reales (Solo llegarán aquí los web)
-      block:
-        - name: Instalar Apache
-          dnf: ...
-      # No necesitas 'when' aquí porque los demás ya fueron expulsados
+  pre_tasks:
+    - name: 🛑 Filtrado de Seguridad - Expulsar hosts que no son APP
+      meta: end_host
+      when: "'app' not in inventory_hostname"
+
+  tasks:
+    - name: Instalar PHP y dependencias comunes
+      dnf:
+        name: 
+          - php
+          - php-cli
+          - php-mysqlnd
+          - python3-pip
+        state: present
+
+    - name: Crear directorio de configuración de la App
+      file:
+        path: /etc/myapp
+        state: directory
+        mode: '0755'
+
+    - name: Desplegar archivo de configuración dummy
+      copy:
+        dest: /etc/myapp/config.ini
+        content: |
+          [database]
+          host=hugo-db-01
+          user=admin_app
+          password=secret
+        mode: '0644'
