@@ -1,17 +1,20 @@
 ---
-- hosts: all
+- name: Instalar Capa de Base de Datos
+  hosts: all
   become: yes
   tasks:
-    - name: Instalar PostgreSQL
+    - name: Instalar servidor MariaDB
       dnf:
-        name: postgresql-server
+        name: mariadb-server
         state: present
-    - name: Inicializar la base de datos
-      command: postgresql-setup --initdb
-      args:
-        creates: /var/lib/pgsql/data/PG_VERSION
-    - name: Iniciar y habilitar servicio postgresql
+
+    - name: Iniciar servicio MariaDB
       service:
-        name: postgresql
+        name: mariadb
         state: started
         enabled: yes
+
+    - name: Crear base de datos dummy
+      command: touch /var/lib/mysql/app_db_initialized
+      args:
+        creates: /var/lib/mysql/app_db_initialized
