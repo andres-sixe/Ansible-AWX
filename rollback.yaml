@@ -1,0 +1,8 @@
+---
+- name: Procedimiento de Rollback
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Notificar Rollback
+      debug:
+        msg: "⚠️ ALERTA: Algo falló. Ejecutando limpieza y rollback..."
