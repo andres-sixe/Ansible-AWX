@@ -1,0 +1,11 @@
+---
+- name: Smoke Test - Verificación de Conectividad
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping de conectividad
+      ping:
+
+    - name: Imprimir nombre del host
+      debug:
+        msg: "Hola desde {{ inventory_hostname }}"
