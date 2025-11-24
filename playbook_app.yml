@@ -1,6 +1,6 @@
 ---
 - name: Instalar Capa de Aplicación
-  hosts: webservers
+  hosts: "*app*" # <--- SOLO EJECUTA EN SERVIDORES 'APP'
   become: yes
   tasks:
     - name: Instalar PHP y dependencias
@@ -11,10 +11,7 @@
           - php-mysqlnd
         state: present
 
-    - name: Crear archivo de configuración de App
+    - name: Crear config dummy
       copy:
         dest: /etc/myapp_config.ini
-        content: |
-          [database]
-          host=db-server
-          user=admin
+        content: "db_host=db-server"
