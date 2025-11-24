@@ -1,15 +1,28 @@
 ---
 - name: Instalar Capa de Base de Datos
-  hosts: "*db*"  # <--- FILTRO POR PATRÓN DE NOMBRE
+  hosts: all
+  gather_facts: yes
   become: yes
+
+  pre_tasks:
+    - name: 🛑 Filtrado de Seguridad - Expulsar hosts que no son DB
+      meta: end_host
+      when: "'db' not in inventory_hostname"
+
   tasks:
     - name: Instalar servidor MariaDB
       dnf:
         name: mariadb-server
         state: present
 
-    - name: Iniciar servicio MariaDB
+    - name: Iniciar y habilitar servicio MariaDB
       service:
         name: mariadb
         state: started
         enabled: yes
+
+    - name: Crear archivo de base de datos simulada
+      command: touch /var/lib/mysql/app_db_initialized
+      args:
+        creates: /var/lib/mysql/app_db_initialized
+      # Esta tarea asegura que no se ejecute si el archivo ya existe (idempotencia)
